@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h> // Required for malloc and free
+
+// Define a node in the linked list using a struct
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Function to create and initialize a new node (simulates a constructor)
+Node* createNode(int x) {
+    // Allocate memory for the new node
+    Node* newNode = (Node*)malloc(sizeof(Node));
+
+    // Check for memory allocation failure
+    if (newNode == NULL) {
+        perror("Failed to allocate memory for a new node");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize the node's fields
+    newNode->data = x;
+    newNode->next = NULL; // Use NULL instead of nullptr
+
+    return newNode;
+}
+
+// Delete the head node and return the new head
+Node* deleteHead(Node* head) {
+
+    // Check if the list is empty
+    if (head == NULL) {
+        return NULL;
+    }
+
+    // Store the current head in a temporary variable
+    Node* temp = head;
+
+    // Move the head pointer to the next node
+    head = head->next;
+
+    // Free the memory of the old head node (C equivalent of 'delete temp')
+    free(temp);
+
+    return head;
+}
+
+// Function to print the linked list
+void printList(Node* curr) {
+    while (curr != NULL) {
+        printf("%d", curr->data);
+        if (curr->next != NULL) {
+            printf(" -> ");
+        }
+        curr = curr->next;
+    }
+    printf("\n"); // Add a newline at the end
+}
+
+// Function to free all the memory used by the linked list (Good practice in C)
+void freeList(Node* head) {
+    Node* curr = head;
+    Node* next;
+
+    while (curr != NULL) {
+        next = curr->next;
+        free(curr);
+        curr = next;
+    }
+}
+
+int main() {
+
+    // Create a hard-coded linked list: 8 -> 2 -> 3 -> 1 -> 7
+    Node* head = createNode(8);
+    head->next = createNode(2);
+    head->next->next = createNode(3);
+    head->next->next->next = createNode(1);
+    head->next->next->next->next = createNode(7);
+
+    printf("Original list:\n");
+    printList(head); // Output: 8 -> 2 -> 3 -> 1 -> 7
+
+    // Delete the head node (8)
+    head = deleteHead(head);
+
+    printf("List after deleting head:\n");
+    printList(head); // Output: 2 -> 3 -> 1 -> 7
+
+    // Clean up: Manually free the remaining allocated memory
+    freeList(head);
+
+    return 0;
+}
