@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h> // Required for malloc
+
+// Define a node in the linked list using a struct
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Function to create and initialize a new node (simulates a constructor)
+Node* createNode(int x) {
+    // Allocate memory for the new node
+    Node* newNode = (Node*)malloc(sizeof(Node));
+
+    // Check if memory allocation was successful
+    if (newNode == NULL) {
+        perror("Failed to allocate memory for a new node");
+        exit(EXIT_FAILURE);
+    }
+    // Initialize the node's fields
+    newNode->data = x;
+    newNode->next = NULL;
+    return newNode;
+}
+// Function to insert a new node at the beginning of the list
+Node* insertAtFront(Node* head, int x) {
+    
+    Node* newNode = createNode(x); // Create the new node
+    newNode->next = head;  // Set the new node's next pointer to the current head
+    
+    return newNode;  // The new node becomes the new head
+}
+
+// Function to print the linked list
+void printList(Node* head) {
+    Node* curr = head;
+    while (curr != NULL) {
+        printf("%d", curr->data);
+        if (curr->next != NULL) {
+            printf(" -> ");
+        }
+        curr = curr->next;
+    }
+    printf("\n");
+}
+
+// Function to free the memory used by the linked list
+void freeList(Node* head) {
+    Node* curr = head;
+    Node* next;
+
+    while (curr != NULL) {
+        next = curr->next; // Store the next pointer
+        free(curr);        // Free the current node
+        curr = next;       // Move to the next node
+    }
+}
+
+int main() {
+    // Create the linked list 2->3->4->5
+    // Note: We use the createNode function instead of 'new' and the constructor
+    Node* head = createNode(2);
+    head->next = createNode(3);
+    head->next->next = createNode(4);
+    head->next->next->next = createNode(5);
+
+    printf("Original list:\n");
+    printList(head);
+
+    // Insert a new node at the front of the list
+    int x = 1;
+    head = insertAtFront(head, x);
+
+    printf("List after inserting %d at front:\n", x);
+    printList(head); // Output: 1 -> 2 -> 3 -> 4 -> 5
+
+    // IMPORTANT: In C, you must manually free the allocated memory
+    freeList(head);
+
+    return 0;
+}
