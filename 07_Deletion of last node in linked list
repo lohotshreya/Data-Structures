@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h> // Required for malloc and free
+
+// Define a node in the linked list using a struct
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Function to create and initialize a new node (simulates a constructor)
+Node* createNode(int x) {
+    // Allocate memory for the new node
+    Node* newNode = (Node*)malloc(sizeof(Node));
+
+    // Check for memory allocation failure
+    if (newNode == NULL) {
+        perror("Failed to allocate memory for a new node");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize the node's fields
+    newNode->data = x;
+    newNode->next = NULL; // Use NULL instead of nullptr
+
+    return newNode;
+}
+
+// Function to remove the last node of the linked list
+Node* removeLastNode(Node* head) {
+    // Handle Case 1: If the list is empty, return NULL
+    if (head == NULL) {
+        return NULL;
+    }
+
+    // Handle Case 2: If the list has only one node
+    if (head->next == NULL) {
+        free(head); // Free the memory of the single node
+        return NULL; // List is now empty
+    }
+
+    // Find the second last node
+    Node* secondLast = head;
+    // We stop when secondLast->next is the last node, so secondLast->next->next will be NULL
+    while (secondLast->next->next != NULL) {
+        secondLast = secondLast->next;
+    }
+
+    // 'temp' now points to the last node
+    Node* temp = secondLast->next;
+
+    // Change next of second last to NULL, disconnecting the last node
+    secondLast->next = NULL;
+
+    // Free the memory of the last node (C equivalent of 'delete temp')
+    free(temp);
+
+    return head;
+}
+
+// Function to print the linked list
+void printList(Node* head) {
+    while (head != NULL) {
+        printf("%d -> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n"); // Use NULL instead of nullptr
+}
+
+// Function to free all the memory used by the linked list (Good practice in C)
+void freeList(Node* head) {
+    Node* curr = head;
+    Node* next;
+
+    while (curr != NULL) {
+        next = curr->next;
+        free(curr);
+        curr = next;
+    }
+}
+
+int main() {
+    // Creating a linked list: 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+    Node* head = createNode(1);
+    head->next = createNode(2);
+    head->next->next = createNode(3);
+    head->next->next->next = createNode(4);
+    head->next->next->next->next = createNode(5);
+
+    printf("Original list:\n");
+    printList(head); // Output: 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+
+    // Removing the last node (5)
+    head = removeLastNode(head);
+
+    printf("List after removing the last node:\n");
+    printList(head); // Output: 1 -> 2 -> 3 -> 4 -> NULL
+
+    // Clean up: Manually free the remaining allocated memory
+    freeList(head);
+
+    return 0;
+}
