@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h> // Required for malloc and free
+
+// Define a node in the linked list using a struct
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Function to create and initialize a new node (simulates a constructor)
+Node* createNode(int x) {
+    // Allocate memory for the new node
+    Node* newNode = (Node*)malloc(sizeof(Node));
+
+    // Check for memory allocation failure
+    if (newNode == NULL) {
+        perror("Failed to allocate memory for a new node");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize the node's fields
+    newNode->data = x;
+    newNode->next = NULL; // Use NULL instead of nullptr
+
+    return newNode;
+}
+
+// Given the head of a list and an int, appends
+// a new node at the end and returns the head.
+Node* insertAtEnd(Node* head, int x) {
+
+    // Create a new node using the helper function
+    Node* newNode = createNode(x);
+
+    // If the Linked List is empty, make
+    // the new node as the head and return
+    if (head == NULL) {
+        return newNode;
+    }
+
+    // Store the head reference in a temporary variable
+    Node* last = head;
+
+    // Traverse till the last node (where last->next is NULL)
+    while (last->next != NULL) {
+        last = last->next;
+    }
+
+    // Change the next pointer of the last node
+    // to point to the new node
+    last->next = newNode;
+
+    // Return the head of the list
+    return head;
+}
+
+// This function prints the contents
+// of the linked list starting from the head
+void printList(Node* node) {
+    while (node != NULL) {
+        printf("%d", node->data);
+        if (node->next != NULL) {
+            printf(" -> ");
+        }
+        node = node->next;
+    }
+    printf("\n"); // Use printf for newline
+}
+
+// Function to free the memory used by the linked list
+void freeList(Node* head) {
+    Node* curr = head;
+    Node* next;
+
+    while (curr != NULL) {
+        next = curr->next; // Store the next pointer
+        free(curr);        // Free the current node
+        curr = next;       // Move to the next node
+    }
+}
+
+int main() {
+
+    // Create a linked list: 1 -> 2 -> 3 -> 4 -> 5
+    // Use createNode() instead of C++ 'new' and constructor
+    Node* head = createNode(1);
+    head->next = createNode(2);
+    head->next->next = createNode(3);
+    head->next->next->next = createNode(4);
+    head->next->next->next->next = createNode(5);
+
+    printf("Original list:\n");
+    printList(head);
+
+    // Insert 6 at the end
+    int x = 6;
+    head = insertAtEnd(head, x);
+
+    printf("List after inserting %d at end:\n", x);
+    printList(head); // Output: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+
+    // Clean up: Manually free the allocated memory
+    freeList(head);
+
+    return 0;
+}
