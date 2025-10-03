@@ -1,0 +1,111 @@
+#include <stdio.h>
+#include <stdlib.h> // Required for malloc and free
+
+// Define a node in the linked list using a struct
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Function to create and initialize a new node (simulates a constructor)
+Node* createNode(int x) {
+    // Allocate memory for the new node
+    Node* newNode = (Node*)malloc(sizeof(Node));
+
+    // Check for memory allocation failure
+    if (newNode == NULL) {
+        perror("Failed to allocate memory for a new node");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize the node's fields
+    newNode->data = x;
+    newNode->next = NULL; // Use NULL instead of nullptr
+
+    return newNode;
+}
+
+// Delete the node at the given position and return the head
+Node* deleteNode(Node* head, int position) {
+    Node* temp = head;
+
+    // Handle case 1: List is empty
+    if (head == NULL) {
+        return NULL;
+    }
+
+    // Handle case 2: Head is to be deleted (position == 1)
+    if (position == 1) {
+        head = temp->next;
+        free(temp); // C equivalent of 'delete temp'
+        return head;
+    }
+
+    // Traverse to the node BEFORE the one to be deleted
+    // 'prev' will point to the (position-1)th node
+    Node* prev = NULL;
+    // Start i at 1 to find the node at position 'position'
+    for (int i = 1; temp != NULL && i < position; i++) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    // Handle case 3: Position is more than the number of nodes
+    if (temp == NULL) {
+        printf("Error: Position %d is out of bounds.\n", position);
+        return head; // Return the original head
+    }
+
+    // Delete the node 'temp'
+    // 'prev' points to the node before 'temp'
+    // Link the previous node to the next node of 'temp'
+    prev->next = temp->next;
+    free(temp); // Free the memory of the deleted node
+
+    return head;
+}
+
+// Function to print the linked list
+void printList(Node* head) {
+    while (head != NULL) {
+        printf("%d -> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\n"); // Use NULL instead of nullptr
+}
+
+// Function to free all the memory used by the linked list (Good practice in C)
+void freeList(Node* head) {
+    Node* curr = head;
+    Node* next;
+
+    while (curr != NULL) {
+        next = curr->next;
+        free(curr);
+        curr = next;
+    }
+}
+
+int main() {
+    // Create a linked list: 1 -> 2 -> 3 -> 4
+    Node* head = createNode(1);
+    head->next = createNode(2);
+    head->next->next = createNode(3);
+    head->next->next->next = createNode(4);
+
+    printf("Original list:\n");
+    printList(head); // Output: 1 -> 2 -> 3 -> 4 -> NULL
+
+    // Delete the node at position 3 (the node containing '3')
+    int position = 3;
+    printf("Deleting node at position %d...\n", position);
+    head = deleteNode(head, position);
+
+    printf("List after deletion:\n");
+    printList(head); // Output: 1 -> 2 -> 4 -> NULL
+
+    // Clean up: Manually free the remaining allocated memory
+    freeList(head);
+
+    return 0;
+}
